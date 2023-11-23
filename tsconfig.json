@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    /* Projects */
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "declaration": true,
+
+    /* Language and Environment */
+    "target": "ESNext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "useDefineForClassFields": true,
+    "moduleDetection": "auto",
+    "sourceMap": true,
+
+    /* Modules */
+    "module": "CommonJS",
+
+    /* Emit */
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "verbatimModuleSyntax": false,
+    "downlevelIteration": false,
+    "noEmitOnError": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "strictNullChecks": true, // zod library require
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+
+    /* Completeness */
+    "skipLibCheck": false,
+
+    "lib": ["ESNext"]
+  },
+  "ts-node": {
+    "esm": false,
+    "experimentalSpecifierResolution": "node"
+  }
+}
