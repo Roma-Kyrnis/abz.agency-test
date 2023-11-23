@@ -1,4 +1,3 @@
-import {  } from "image-size";
 
 export abstract class FileTypeValidatorCustom<TValidationOptions = Record<string, any>> {
   constructor(protected readonly validationOptions: TValidationOptions) {}
