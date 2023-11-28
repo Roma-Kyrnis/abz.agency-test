@@ -19,8 +19,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/auth.guard';
 import config from '../../config';
 import { UsersHttpService } from './users-http.service';
-import { CreateUserDTO, CreateUserSchema, GetUserDTO, GetUserSchema } from './dto/users.dto';
+import { CreateUserDTO, CreateUserSchema, GetUserDTO, GetUsersAvatarDTO } from './dto/users.dto';
 import { ZodValidationPipe } from '../../pipes/zodValidationPipe/zodValidation.pipe';
+import { User } from './user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -31,6 +32,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('photo'))
   createUser(
     @Body(new ZodValidationPipe(CreateUserSchema, 422)) user: CreateUserDTO,
+    @UploadedFile()
     // @UploadedFile(
     //   new ParseFilePipe({
     //     errorHttpStatusCode: 422,
@@ -50,12 +52,9 @@ export class UsersController {
     //     ],
     //   }),
     // )
-    // photo: Express.Multer.File,
+    photo: Express.Multer.File,
   ) {
-    // console.log(user);
-    // console.log(photo);
-
-    return this.usersHttpService.createUser(user, user.photo);
+    return this.usersHttpService.createUser(user, photo);
   }
 
   @Get()
@@ -64,12 +63,12 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UsePipes(new ZodValidationPipe(GetUserSchema, 400))
-  getUserById(@Param() { id }: GetUserDTO) {
-    const idNumber = parseInt(id, 10);
-    if (!Number.isNaN(idNumber)) {
-      return this.usersHttpService.getUserById(idNumber);
-    }
-    return new HttpException('The user_id must be an integer.', HttpStatus.BAD_REQUEST);
+  getUserById(@Param() { id }: GetUserDTO): Promise<User> {
+    return this.usersHttpService.getUserById(id);
+  }
+
+  @Get('avatar/:filename')
+  getUsersAvatar(@Param() { filename }: GetUsersAvatarDTO): Promise<string> {
+    return this.usersHttpService.getUsersAvatar(filename);
   }
 }

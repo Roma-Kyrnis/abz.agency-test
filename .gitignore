@@ -398,3 +398,6 @@ Temporary Items
 dist
 .webpack
 .serverless/**/*.zip
+
+# Google Cloud Storage Credentials
+GoogleStorageCredentials.json

@@ -32,12 +32,11 @@ const UserSchema = z.object({
       message: 'The phone must be a valid Ukraine phone number. For example: +380123456789.',
     }),
   position_id: z
-    .number({
+    .string({
       required_error: 'The position id field is required.',
       invalid_type_error: 'The position id must be a number',
     })
-    .int({ message: 'The position id must be an integer' })
-    .min(1, { message: 'The position id must be at least 1' }),
+    .regex(/^\d+$/, { message: 'The position id must be an integer at least 1' }),
   // TODO: remove or use photo: z.null()
   photo: z.any(),
 });
@@ -47,28 +46,23 @@ const PhotoSchema = z
     photo: z.string(),
   })
   .required();
-const DBUserSchema = UserSchema.merge(PhotoSchema);
+const DBUserSchema = UserSchema.merge(PhotoSchema).merge(
+  z
+    .object({ id: z.string(), position_id: z.number(), registration_timestamp: z.number() })
+    .required(),
+);
 
 /** Create User Schema */
 export const CreateUserSchema = UserSchema.required();
 export type CreateUserDTO = z.infer<typeof CreateUserSchema>;
 export type DBCreateUserDTO = z.infer<typeof DBUserSchema>;
 
-/** Get User Schema Param*/
-export const GetUserSchema = z
-  .object({
-    id: z
-      .string({
-        required_error: 'The id param is required',
-        invalid_type_error: 'The id must be a string with number inside',
-      })
-      .regex(/^\d+$/, {
-        message: 'The id must be a string with only integer numbers without spaces',
-      }),
-  })
-  .required();
-export type GetUserDTO = z.infer<typeof GetUserSchema>;
+/** Get User Param*/
+export type GetUserDTO = { id: string };
 
 /** Update User Schema */
 export const UpdateUserSchema = UserSchema.partial();
 export type UpdateUserDTO = z.infer<typeof UpdateUserSchema>;
+
+/** Get User's avatar Schema Param*/
+export type GetUsersAvatarDTO = { filename: string };

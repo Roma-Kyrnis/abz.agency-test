@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectLiteral, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { User } from './user.entity';
 import { DBCreateUserDTO } from './dto/users.dto';
@@ -17,16 +17,15 @@ export class UsersService {
    * @param user with link to photo
    * @returns ID of created user
    */
-  async create(user: DBCreateUserDTO): Promise<number> {
-    const res = await this.usersRepository.insert(user);
-    return res.identifiers[0].id;
+  async create(user: DBCreateUserDTO): Promise<void> {
+    await this.usersRepository.insert(user);
   }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User | null> {
+  findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
   }
 }

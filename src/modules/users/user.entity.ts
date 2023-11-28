@@ -1,10 +1,10 @@
 import { Position } from '../positions/position.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn('uuid')
+  id: string;
 
   @Column()
   name: string;

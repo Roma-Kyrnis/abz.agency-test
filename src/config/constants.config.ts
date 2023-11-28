@@ -10,12 +10,15 @@ export default {
   DEFAULT_PORT: 3000,
   DEFAULT_HOST: '::',
 
+  GOOGLE_CLOUD_STORAGE_PATH: 'GoogleStorageCredentials.json',
+
   PHOTO: {
     MIN_WIDTH: 70,
     MIN_HEIGHT: 70,
     MAX_SIZE: 5 * 1000 * 1000,
     ALLOWED_TYPES: photoAllowedTypes,
     ALLOWED_TYPES_REGEXP: photoAllowedTypesRegExp,
+    DOWNLOAD_URL_PATH: '/api/v1/users/avatar',
   },
 
   API: {

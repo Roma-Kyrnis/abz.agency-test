@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash as bcryptHash } from 'bcrypt';
 import { v4 as uuidV4 } from 'uuid';
@@ -15,13 +15,24 @@ export class AuthHttpService {
   ) {}
 
   async getToken() {
-    const id = uuidV4();
+    try {
+      const id = uuidV4();
 
-    const token = await this.jwtService.signAsync({ sub: id } as SignTokenJWTPayload);
-    const hash = await this.getHashedToken(token);
+      const token = await this.jwtService.signAsync({ sub: id } as SignTokenJWTPayload);
+      const hash = await this.getHashedToken(token);
 
-    await this.authService.createToken({ id, token: hash });
-    return { success: true, token };
+      await this.authService.createToken({ id, token: hash });
+      return { success: true, token };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(
+        {
+          success: false,
+          message: 'Internal server error. Please contact to developers team',
+        },
+        { cause: err },
+      );
+    }
   }
 
   private getHashedToken(token: string): Promise<string> {

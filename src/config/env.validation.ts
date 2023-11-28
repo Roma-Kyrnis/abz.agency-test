@@ -29,6 +29,9 @@ class EnvironmentVariables {
   @IsString()
   HOST: string;
 
+  @IsString()
+  SERVER_DOMAIN_ADDRESS: string;
+
   /** MySQL */
   @IsString()
   MYSQL_HOST: string;
@@ -65,15 +68,9 @@ class EnvironmentVariables {
   @IsNumber()
   BCRYPT_SALT_ROUNDS: number;
 
-  /** Dropbox */
+  /** Google Cloud Storage */
   @IsString()
-  DROPBOX_APP_KEY: string;
-
-  @IsString()
-  DROPBOX_APP_SECRET: string;
-
-  @IsString()
-  DROPBOX_APP_FOLDER_NAME: string;
+  GOOGLE_STORAGE_BUCKET_NAME: string;
 }
 
 const validation = (): EnvironmentVariables => {
@@ -84,6 +81,7 @@ const validation = (): EnvironmentVariables => {
     /** Server */
     PORT: parseInt(process.env.PORT ?? '', 10) || constants.DEFAULT_PORT,
     HOST: process.env.HOST ?? constants.DEFAULT_HOST,
+    SERVER_DOMAIN_ADDRESS: process.env.SERVER_DOMAIN_ADDRESS,
 
     /** MySQL */
     MYSQL_HOST: process.env.MYSQL_HOST,
@@ -102,10 +100,8 @@ const validation = (): EnvironmentVariables => {
     /** Bcrypt */
     BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS,
 
-    /** Dropbox */
-    DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
-    DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET,
-    DROPBOX_APP_FOLDER_NAME: process.env.DROPBOX_APP_FOLDER_NAME,
+    /** Google Cloud Storage */
+    GOOGLE_STORAGE_BUCKET_NAME: process.env.GOOGLE_STORAGE_BUCKET_NAME,
   };
 
   try {
