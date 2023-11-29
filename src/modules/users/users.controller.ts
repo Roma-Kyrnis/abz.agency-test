@@ -9,6 +9,7 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -19,7 +20,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/auth.guard';
 import config from '../../config';
 import { UsersHttpService } from './users-http.service';
-import { CreateUserDTO, CreateUserSchema, GetUserDTO, GetUsersAvatarDTO } from './dto/users.dto';
+import {
+  CreateUserDTO,
+  CreateUserSchema,
+  GetAllUsersParamsDTO,
+  GetAllUsersParamsResponse,
+  GetAllUsersParamsSchema,
+  GetUserDTO,
+  GetUsersAvatarDTO,
+} from './dto/users.dto';
 import { ZodValidationPipe } from '../../pipes/zodValidationPipe/zodValidation.pipe';
 import { User } from './user.entity';
 
@@ -32,9 +41,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('photo'))
   createUser(
     @Body(new ZodValidationPipe(CreateUserSchema, 422)) user: CreateUserDTO,
-    @UploadedFile()
-    // @UploadedFile(
-    //   new ParseFilePipe({
+    @UploadedFile() // @UploadedFile(
+    photo //   new ParseFilePipe({
     //     errorHttpStatusCode: 422,
     //     fileIsRequired: true,
     //     exceptionFactory: (error: string) => {
@@ -52,14 +60,16 @@ export class UsersController {
     //     ],
     //   }),
     // )
-    photo: Express.Multer.File,
+    : Express.Multer.File,
   ) {
     return this.usersHttpService.createUser(user, photo);
   }
 
   @Get()
-  getAllUsers() {
-    return this.usersHttpService.getAllUsers();
+  getAllUsers(
+    @Query(new ZodValidationPipe(GetAllUsersParamsSchema, 422)) params: GetAllUsersParamsDTO,
+  ): Promise<GetAllUsersParamsResponse> {
+    return this.usersHttpService.getAllUsers(params);
   }
 
   @Get(':id')

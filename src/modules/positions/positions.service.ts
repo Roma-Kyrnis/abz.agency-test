@@ -23,4 +23,8 @@ export class PositionsService {
   findAll(): Promise<Position[]> {
     return this.positionsRepository.find();
   }
+
+  findOne(id: number): Promise<Position | null> {
+    return this.positionsRepository.findOneBy({ id });
+  }
 }

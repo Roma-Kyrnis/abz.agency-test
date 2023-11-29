@@ -81,6 +81,7 @@ const validation = (): EnvironmentVariables => {
     /** Server */
     PORT: parseInt(process.env.PORT ?? '', 10) || constants.DEFAULT_PORT,
     HOST: process.env.HOST ?? constants.DEFAULT_HOST,
+    /** TODO: Don't add slash after this env variable because it's auto added */
     SERVER_DOMAIN_ADDRESS: process.env.SERVER_DOMAIN_ADDRESS,
 
     /** MySQL */

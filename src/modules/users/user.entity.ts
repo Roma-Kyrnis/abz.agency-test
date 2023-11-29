@@ -1,5 +1,5 @@
 import { Position } from '../positions/position.entity';
-import { Entity, Column, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User {
@@ -21,7 +21,14 @@ export class User {
   @Column('bigint')
   registration_timestamp: number;
 
-  @OneToOne(() => Position)
-  @JoinColumn({ name: 'position_id' })
+  @Column('int')
+  position_id: number;
+
+  @ManyToOne(() => Position, (position) => position.users, { nullable: false })
+  @JoinColumn({
+    name: 'position_id',
+    foreignKeyConstraintName: 'position_id',
+    referencedColumnName: 'id',
+  })
   position: Position;
 }

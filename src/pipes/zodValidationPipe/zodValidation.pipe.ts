@@ -4,17 +4,19 @@ import {
   BadRequestException,
   HttpException,
 } from '@nestjs/common';
-import { ZodIssue, ZodObject } from 'zod';
+import { ZodEffects, ZodIssue, ZodObject } from 'zod';
 import { ZodFailHandlerRes } from './interfaces/zodValidationPipe.interface';
 
 export class ZodValidationPipe implements PipeTransform {
   constructor(
-    private schema: ZodObject<any>,
+    private schema: ZodObject<any> | ZodEffects<any>,
     private status: number,
   ) {}
 
   private getFails(issues: ZodIssue[]) {
     const fails: ZodFailHandlerRes = {};
+    console.log({ issues });
+
     for (const issue of issues) {
       for (const path of issue.path) {
         let readablePath = path;
@@ -29,6 +31,7 @@ export class ZodValidationPipe implements PipeTransform {
   async transform(value: unknown, metadata: ArgumentMetadata) {
     try {
       const res = await this.schema.safeParseAsync(value);
+
       if (!res.success) {
         throw new HttpException(
           {

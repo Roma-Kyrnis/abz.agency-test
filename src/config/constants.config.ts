@@ -21,6 +21,10 @@ export default {
     DOWNLOAD_URL_PATH: '/api/v1/users/avatar',
   },
 
+  USERS: {
+    REQUEST_GET_ALL_PATH: '/api/v1/users',
+  },
+
   API: {
     GLOBAL_PREFIX: 'api',
     GLOBAL_VERSION: 'v1',

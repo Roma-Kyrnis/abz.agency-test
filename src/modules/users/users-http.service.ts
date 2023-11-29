@@ -9,15 +9,23 @@ import { v4 as uuidV4 } from 'uuid';
 
 import config from '../../config';
 import { UsersService } from './users.service';
-import { CreateUserDTO, DBCreateUserDTO } from './dto/users.dto';
+import {
+  CreateUserDTO,
+  DBCreateUserDTO,
+  DBGetAllUsersParamsDTO,
+  GetAllUsersParamsDTO,
+  GetAllUsersParamsResponse,
+} from './dto/users.dto';
 import { FileStorageService } from '../fileStorage/fileStorage.service';
 import { User } from './user.entity';
+import { PositionsService } from '../positions/positions.service';
 
 @Injectable()
 export class UsersHttpService {
   constructor(
     private readonly usersService: UsersService,
     private readonly fileStorageService: FileStorageService,
+    private readonly positionsService: PositionsService,
   ) {}
 
   async createUser(
@@ -46,15 +54,31 @@ export class UsersHttpService {
     }
 
     const photoUrl = `${config.env.SERVER_DOMAIN_ADDRESS}${config.constants.PHOTO.DOWNLOAD_URL_PATH}/${photoName}`;
+    const positionId = parseInt(requestUser.position_id, 10);
+    const position = await this.positionsService.findOne(positionId);
+
+    if (!position) {
+      throw new BadRequestException(
+        {
+          success: false,
+          message: 'Validation failed',
+          fails: {
+            position_id: ['Invalid position_id. Please make sure the position with this id exist.'],
+          },
+        },
+        { cause: new NotFoundException() },
+      );
+    }
+
     const user: DBCreateUserDTO = {
       ...requestUser,
-      position_id: parseInt(requestUser.position_id, 10),
+      position_id: positionId,
       registration_timestamp: Date.now(),
       id: userId,
       photo: photoUrl,
     };
     try {
-      await this.usersService.create(user);
+      await this.usersService.create({ ...user, position });
       return user;
     } catch (error) {
       throw new ConflictException({
@@ -64,8 +88,14 @@ export class UsersHttpService {
     }
   }
 
-  getAllUsers() {
-    return this.usersService.findAll();
+  getAllUsers(params: GetAllUsersParamsDTO): Promise<GetAllUsersParamsResponse> {
+    const parsedParams: DBGetAllUsersParamsDTO = {
+      count: parseInt(params.count, 10),
+    };
+    if (params.offset) parsedParams.offset = parseInt(params.offset, 10);
+    if (params.page) parsedParams.page = parseInt(params.page, 10);
+
+    return this.usersService.findAll(parsedParams);
   }
 
   async getUserById(id: string): Promise<User> {

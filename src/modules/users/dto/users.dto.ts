@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { User } from '../user.entity';
+import { Position } from 'src/modules/positions/position.entity';
 
 const UserSchema = z.object({
   name: z
@@ -57,8 +59,52 @@ export const CreateUserSchema = UserSchema.required();
 export type CreateUserDTO = z.infer<typeof CreateUserSchema>;
 export type DBCreateUserDTO = z.infer<typeof DBUserSchema>;
 
-/** Get User Param*/
+/** Get User Param */
 export type GetUserDTO = { id: string };
+
+/** Get All Users Params */
+export const GetAllUsersParamsSchema = z
+  .object({
+    offset: z.string().regex(/^\d+$/, 'The offset parameter must be at least 0').optional(),
+    page: z
+      .string()
+      .regex(/^[1-9](\d+)?$/, 'The page parameter must be at least 1')
+      .optional(),
+    count: z
+      .string()
+      .regex(/^(100|[1-9]\d?)$/, 'The count parameter must be between 1 and 100')
+      .default('5'),
+  })
+  .superRefine(({ offset, page }, ctx) => {
+    if (offset && page) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'You can not use offset and page at the same time',
+        path: ['offset', 'page'],
+      });
+    } else if (!offset && !page) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'You must use offset or page param',
+        path: ['offset', 'page'],
+      });
+    }
+  });
+export type GetAllUsersParamsDTO = z.infer<typeof GetAllUsersParamsSchema>;
+export type DBGetAllUsersParamsDTO = { page?: number; offset?: number; count: number };
+export type GetAllUsersParamsResponse = {
+  success: boolean;
+  page: number | undefined;
+  offset: number | undefined;
+  total_pages: number;
+  total_users: number;
+  count: number;
+  links: {
+    next_url: string | null;
+    prev_url: string | null;
+  };
+  users: User[];
+};
 
 /** Update User Schema */
 export const UpdateUserSchema = UserSchema.partial();

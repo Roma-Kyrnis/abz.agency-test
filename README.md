@@ -59,6 +59,8 @@ $ npm run test:cov
 ```
 
 ## Migrations
+
+<name> - is the name of the migration file
 ```bash
 # generate migrations from entities
 npm run typeorm migration:generate src/database/migrations/<name> -- -d src/database/datasource.config.ts
@@ -67,7 +69,7 @@ npm run typeorm migration:generate src/database/migrations/<name> -- -d src/data
 npm run typeorm migration:generate src/database/migrations/<name> -- -d src/database/datasource.config.ts
 
 # generate migrations from entities in development mode
-NODE_ENV=development npm run typeorm migration:generate src/database/migrations/<name> -- -d src/config/database.config.ts
+NODE_ENV=development npm run typeorm migration:generate src/database/migrations/<name> -- -d src/database/datasource.config.ts
 ```
 
 ## Support
