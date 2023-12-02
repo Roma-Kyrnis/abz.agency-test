@@ -3,7 +3,7 @@ export default {
   env: {
     es2024: true,
     node: true,
-    mongo: true,
+    mysql: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {

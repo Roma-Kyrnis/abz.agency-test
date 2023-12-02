@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import config from '../../config';
 import { User } from './user.entity';
-import { DBGetAllUsersParamsDTO, GetAllUsersParamsResponse } from './dto/users.dto';
+import { DBGetAllUsersParamsDTO, GetAllUsersParamsResponse, GetUserDTO } from './dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +39,7 @@ export class UsersService {
       take: count,
       skip,
       order: { registration_timestamp: 'DESC' },
+      relations: ['position'],
     });
 
     const totalPages = Math.ceil(totalUsers / count);
@@ -75,11 +76,27 @@ export class UsersService {
         next_url: nextUrl,
         prev_url: prevUrl,
       },
-      users,
+      users: users.map(user => this.convertDBUser(user)),
     };
   }
 
-  findOne(id: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: string): Promise<GetUserDTO | null> {
+    const res = await this.usersRepository.findOne({ where: { id }, relations: ['position'] });
+
+    if (res) {
+      return this.convertDBUser(res);
+    }
+
+    return null;
+  }
+
+  private convertDBUser(user: User): GetUserDTO {
+    const { position, registration_timestamp } = user;
+    return {
+      ...user,
+      registration_timestamp: registration_timestamp.getTime(),
+      position: position.name,
+      position_id: position.id,
+    };
   }
 }

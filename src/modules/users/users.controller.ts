@@ -1,24 +1,17 @@
 import {
   Body,
   Controller,
-  FileTypeValidator,
   Get,
-  HttpException,
-  HttpStatus,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   Post,
   Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { AuthGuard } from '../auth/auth.guard';
-import config from '../../config';
 import { UsersHttpService } from './users-http.service';
 import {
   CreateUserDTO,
@@ -27,10 +20,12 @@ import {
   GetAllUsersParamsResponse,
   GetAllUsersParamsSchema,
   GetUserDTO,
+  GetUserParamDTO,
   GetUsersAvatarDTO,
 } from './dto/users.dto';
-import { ZodValidationPipe } from '../../pipes/zodValidationPipe/zodValidation.pipe';
-import { User } from './user.entity';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
+import { PhotoValidationPipe } from '../../pipes/photoValidation.pipe';
+import { PhotoOptimizationPipe } from '../../pipes/photoOptimization.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -41,26 +36,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('photo'))
   createUser(
     @Body(new ZodValidationPipe(CreateUserSchema, 422)) user: CreateUserDTO,
-    @UploadedFile() // @UploadedFile(
-    photo //   new ParseFilePipe({
-    //     errorHttpStatusCode: 422,
-    //     fileIsRequired: true,
-    //     exceptionFactory: (error: string) => {
-    //       console.log('photo error', error);
-
-    //       let messages = [];
-    //       if (error.includes('size')) messages.push('The photo may not be greater than 5 Mbytes.');
-    //       if (error.includes('type')) messages.push('The photo must be JPEG or JPG types');
-
-    //       return { success: false, fails: { photo: messages } };
-    //     },
-    //     validators: [
-    //       new MaxFileSizeValidator({ maxSize: config.constants.PHOTO.MAX_SIZE }),
-    //       new FileTypeValidator({ fileType: config.constants.PHOTO.ALLOWED_TYPES_REGEXP }),
-    //     ],
-    //   }),
-    // )
-    : Express.Multer.File,
+    @UploadedFile(PhotoValidationPipe, PhotoOptimizationPipe)
+    photo: Express.Multer.File,
   ) {
     return this.usersHttpService.createUser(user, photo);
   }
@@ -73,7 +50,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param() { id }: GetUserDTO): Promise<User> {
+  getUserById(@Param() { id }: GetUserParamDTO): Promise<GetUserDTO> {
     return this.usersHttpService.getUserById(id);
   }
 

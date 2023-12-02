@@ -24,7 +24,6 @@ export class AuthHttpService {
       await this.authService.createToken({ id, token: hash });
       return { success: true, token };
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(
         {
           success: false,

@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { v4 as uuidV4 } from 'uuid';
@@ -11,14 +12,15 @@ import config from '../../config';
 import { UsersService } from './users.service';
 import {
   CreateUserDTO,
-  DBCreateUserDTO,
+  CreateUserResponseDTO,
   DBGetAllUsersParamsDTO,
   GetAllUsersParamsDTO,
   GetAllUsersParamsResponse,
+  GetUserDTO,
 } from './dto/users.dto';
 import { FileStorageService } from '../fileStorage/fileStorage.service';
-import { User } from './user.entity';
 import { PositionsService } from '../positions/positions.service';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersHttpService {
@@ -31,14 +33,14 @@ export class UsersHttpService {
   async createUser(
     requestUser: CreateUserDTO,
     photo: Express.Multer.File,
-  ): Promise<DBCreateUserDTO> {
+  ): Promise<CreateUserResponseDTO> {
     const userId = uuidV4();
-    const photoName = `${this.get6DigitMD5(userId)}-${userId}`;
+    const photoName = `${this.get6DigitMD5(userId)}-${userId}.${
+      config.constants.PHOTO.AVATAR_FORMAT
+    }`;
     try {
       await this.fileStorageService.savePhoto(photoName, photo.buffer);
     } catch (error) {
-      console.log(error);
-
       throw new ConflictException(
         {
           success: false,
@@ -58,33 +60,40 @@ export class UsersHttpService {
     const position = await this.positionsService.findOne(positionId);
 
     if (!position) {
-      throw new BadRequestException(
+      throw new UnprocessableEntityException(
         {
           success: false,
           message: 'Validation failed',
           fails: {
-            position_id: ['Invalid position_id. Please make sure the position with this id exist.'],
+            position_id: ['Position ID must be correct position_id and number bigger than 0.'],
           },
         },
         { cause: new NotFoundException() },
       );
     }
 
-    const user: DBCreateUserDTO = {
+    const user: User = {
       ...requestUser,
-      position_id: positionId,
-      registration_timestamp: Date.now(),
+      position,
+      registration_timestamp: new Date(),
       id: userId,
       photo: photoUrl,
     };
     try {
-      await this.usersService.create({ ...user, position });
-      return user;
+      await this.usersService.create(user);
+      return {
+        success: true,
+        message: 'New user created successfully registered',
+        user_id: user.id,
+      };
     } catch (error) {
-      throw new ConflictException({
-        success: false,
-        message: 'User with this phone or email already exist',
-      });
+      throw new ConflictException(
+        {
+          success: false,
+          message: 'User with this phone or email already exist',
+        },
+        { cause: error },
+      );
     }
   }
 
@@ -98,7 +107,7 @@ export class UsersHttpService {
     return this.usersService.findAll(parsedParams);
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(id: string): Promise<GetUserDTO> {
     try {
       const user = await this.usersService.findOne(id);
       if (user) {
@@ -110,7 +119,10 @@ export class UsersHttpService {
         fails: { user_id: ['User not found'] },
       });
     } catch (error) {
-      throw new BadRequestException({ success: false, message: 'User not found' });
+      throw new BadRequestException(
+        { success: false, message: 'User not found' },
+        { cause: error },
+      );
     }
   }
 
@@ -122,11 +134,14 @@ export class UsersHttpService {
       }
       return { success: true, buffer: res };
     } catch (error) {
-      throw new NotFoundException({
-        success: false,
-        message: 'The users avatar does not exist',
-        fails: { avatar: ['Users avatar not found'] },
-      });
+      throw new NotFoundException(
+        {
+          success: false,
+          message: 'The users avatar does not exist',
+          fails: { avatar: ['Users avatar not found'] },
+        },
+        { cause: error },
+      );
     }
   }
 

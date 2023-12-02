@@ -1,5 +1,5 @@
 import { Position } from '../positions/position.entity';
-import { Entity, Column, OneToOne, JoinColumn, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, JoinColumn, PrimaryColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User {
@@ -18,11 +18,8 @@ export class User {
   @Column('text')
   photo: string;
 
-  @Column('bigint')
-  registration_timestamp: number;
-
-  @Column('int')
-  position_id: number;
+  @Column('datetime')
+  registration_timestamp: Date;
 
   @ManyToOne(() => Position, (position) => position.users, { nullable: false })
   @JoinColumn({

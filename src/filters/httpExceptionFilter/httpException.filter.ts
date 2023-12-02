@@ -10,8 +10,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    console.log('cause exception: ', exception?.cause);
+    console.log('exception: ', exception);
+
     if (!(exception instanceof HttpException)) {
-      console.log(exception);
 
       response.status(500).json({
         statusCode: 500,

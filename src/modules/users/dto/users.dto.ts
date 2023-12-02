@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { User } from '../user.entity';
-import { Position } from 'src/modules/positions/position.entity';
 
 const UserSchema = z.object({
   name: z
@@ -40,27 +39,16 @@ const UserSchema = z.object({
     })
     .regex(/^\d+$/, { message: 'The position id must be an integer at least 1' }),
   // TODO: remove or use photo: z.null()
-  photo: z.any(),
+  // photo: z.any(),
 });
 
-const PhotoSchema = z
-  .object({
-    photo: z.string(),
-  })
-  .required();
-const DBUserSchema = UserSchema.merge(PhotoSchema).merge(
-  z
-    .object({ id: z.string(), position_id: z.number(), registration_timestamp: z.number() })
-    .required(),
-);
-
-/** Create User Schema */
+/** Create User */
 export const CreateUserSchema = UserSchema.required();
 export type CreateUserDTO = z.infer<typeof CreateUserSchema>;
-export type DBCreateUserDTO = z.infer<typeof DBUserSchema>;
+export type CreateUserResponseDTO = {success: boolean; message: string; user_id: string}
 
 /** Get User Param */
-export type GetUserDTO = { id: string };
+export type GetUserParamDTO = { id: string };
 
 /** Get All Users Params */
 export const GetAllUsersParamsSchema = z
@@ -103,7 +91,14 @@ export type GetAllUsersParamsResponse = {
     next_url: string | null;
     prev_url: string | null;
   };
-  users: User[];
+  users: GetUserDTO[];
+};
+
+/** Get User */
+export type GetUserDTO = Omit<User, 'position' | 'registration_timestamp'> & {
+  position: string;
+  position_id: number;
+  registration_timestamp: number;
 };
 
 /** Update User Schema */

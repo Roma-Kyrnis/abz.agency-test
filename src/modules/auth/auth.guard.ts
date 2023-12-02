@@ -34,8 +34,8 @@ export class AuthGuard implements CanActivate {
           message: 'The Token already used or incorrect, please generate new one',
         });
       }
-    } catch (error) {
-      if ( 'success' in (error as any)?.getResponse()) throw error;
+    } catch (error: any) {
+      if ('getResponse' in error && 'success' in error.getResponse()) throw error;
 
       throw new UnauthorizedException(
         { success: false, message: 'The token expired' },

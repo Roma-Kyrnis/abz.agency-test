@@ -15,7 +15,6 @@ export class ZodValidationPipe implements PipeTransform {
 
   private getFails(issues: ZodIssue[]) {
     const fails: ZodFailHandlerRes = {};
-    console.log({ issues });
 
     for (const issue of issues) {
       for (const path of issue.path) {
@@ -45,7 +44,7 @@ export class ZodValidationPipe implements PipeTransform {
       return res.data;
     } catch (error) {
       if (Object.hasOwn((error as any).response, 'success')) throw error;
-      throw new BadRequestException('Validation failed');
+      throw new BadRequestException('Validation failed', { cause: error });
     }
   }
 }
