@@ -15,7 +15,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UsersHttpService } from './users-http.service';
 import {
   CreateUserDTO,
-  CreateUserSchema,
+  UserSchema,
   GetAllUsersParamsDTO,
   GetAllUsersParamsResponse,
   GetAllUsersParamsSchema,
@@ -35,7 +35,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('photo'))
   createUser(
-    @Body(new ZodValidationPipe(CreateUserSchema, 422)) user: CreateUserDTO,
+    @Body(new ZodValidationPipe(UserSchema, 422)) user: CreateUserDTO,
     @UploadedFile(PhotoValidationPipe, PhotoOptimizationPipe)
     photo: Express.Multer.File,
   ) {

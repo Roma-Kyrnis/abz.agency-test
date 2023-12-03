@@ -44,8 +44,8 @@ export class UsersService {
 
     const totalPages = Math.ceil(totalUsers / count);
     const getAllUsersURL = `${config.env.SERVER_DOMAIN_ADDRESS}${config.constants.USERS.REQUEST_GET_ALL_PATH}`;
-    let prevUrl = null;
-    let nextUrl = null;
+    let prevUrl: string | null = null;
+    let nextUrl: string | null = null;
 
     if (offset !== undefined) {
       if (offset > 0) {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { User } from '../user.entity';
 
-const UserSchema = z.object({
+export const UserSchema = z.object({
   name: z
     .string({
       required_error: 'The name field is required.',
@@ -38,13 +38,10 @@ const UserSchema = z.object({
       invalid_type_error: 'The position id must be a number',
     })
     .regex(/^\d+$/, { message: 'The position id must be an integer at least 1' }),
-  // TODO: remove or use photo: z.null()
-  // photo: z.any(),
-});
+}).required();
 
 /** Create User */
-export const CreateUserSchema = UserSchema.required();
-export type CreateUserDTO = z.infer<typeof CreateUserSchema>;
+export type CreateUserDTO = z.infer<typeof UserSchema>;
 export type CreateUserResponseDTO = {success: boolean; message: string; user_id: string}
 
 /** Get User Param */
