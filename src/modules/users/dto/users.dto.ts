@@ -98,9 +98,5 @@ export type GetUserDTO = Omit<User, 'position' | 'registration_timestamp'> & {
   registration_timestamp: number;
 };
 
-/** Update User Schema */
-export const UpdateUserSchema = UserSchema.partial();
-export type UpdateUserDTO = z.infer<typeof UpdateUserSchema>;
-
 /** Get User's avatar Schema Param*/
 export type GetUsersAvatarDTO = { filename: string };
