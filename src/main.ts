@@ -13,6 +13,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(helmet());
+  app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
   app.use(cors());
   await app.listen(config.env.PORT, config.env.HOST, () => {
     console.log(`Server running on HOST ${config.env.HOST} and PORT ${config.env.PORT}`);
