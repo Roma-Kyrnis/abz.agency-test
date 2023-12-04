@@ -71,6 +71,9 @@ class EnvironmentVariables {
   /** Google Cloud Storage */
   @IsString()
   GOOGLE_STORAGE_BUCKET_NAME: string;
+
+  @IsString()
+  GOOGLE_STORAGE_CREDENTIALS_BASE64: string;
 }
 
 const validation = (): EnvironmentVariables => {
@@ -103,6 +106,7 @@ const validation = (): EnvironmentVariables => {
 
     /** Google Cloud Storage */
     GOOGLE_STORAGE_BUCKET_NAME: process.env.GOOGLE_STORAGE_BUCKET_NAME,
+    GOOGLE_STORAGE_CREDENTIALS_BASE64: process.env.GOOGLE_STORAGE_CREDENTIALS_BASE64,
   };
 
   try {

@@ -5,9 +5,7 @@ import config from '../../config';
 
 @Injectable()
 export class FileStorageService {
-  bucket = new Storage({ keyFilename: config.constants.GOOGLE_CLOUD_STORAGE_PATH }).bucket(
-    config.env.GOOGLE_STORAGE_BUCKET_NAME,
-  );
+  bucket = new Storage({ keyFilename: config.createGoogleStorageCredentialsFile.keyFilename }).bucket(config.env.GOOGLE_STORAGE_BUCKET_NAME);
 
   async savePhoto(filename: string, photo: Buffer): Promise<void> {
     await this.bucket.file(filename).save(photo);
