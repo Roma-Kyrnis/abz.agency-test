@@ -5,11 +5,13 @@ import {
   Param,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 import { AuthGuard } from '../auth/auth.guard';
 import { UsersHttpService } from './users-http.service';
@@ -55,7 +57,18 @@ export class UsersController {
   }
 
   @Get('avatar/:filename')
-  getUsersAvatar(@Param() { filename }: GetUsersAvatarDTO): Promise<string> {
-    return this.usersHttpService.getUsersAvatar(filename);
+  async getUsersAvatar(
+    @Param() { filename }: GetUsersAvatarDTO,
+    @Res() response: Response,
+  ): Promise<void> {
+    const avatarBuffer = await this.usersHttpService.getUsersAvatar(filename);
+
+    const headers = {
+      'Content-disposition': 'inline',
+      'Content-Type': 'image/jpg',
+    };
+
+    response.status(200).set(headers);
+    avatarBuffer.pipe(response);
   }
 }

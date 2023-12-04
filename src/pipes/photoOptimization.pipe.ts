@@ -16,7 +16,10 @@ export class PhotoOptimizationPipe implements PipeTransform {
       const imageSharp = await sharp(value.buffer)
         .resize(config.constants.PHOTO.AVATAR_WIDTH, config.constants.PHOTO.AVATAR_HEIGHT)
         .jpeg({
-          quality: config.constants.PHOTO.AVATAR_QUALITY,
+          quality:
+            value.size >= config.constants.PHOTO.AVATAR_MIN_SIZE_TO_OPTIMIZE
+              ? config.constants.PHOTO.AVATAR_QUALITY
+              : 100,
           chromaSubsampling: config.constants.PHOTO.AVATAR_CHROMA_SUBSAMPLING,
           force: true,
           mozjpeg: true,

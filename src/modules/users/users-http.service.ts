@@ -21,6 +21,7 @@ import {
 import { FileStorageService } from '../fileStorage/fileStorage.service';
 import { PositionsService } from '../positions/positions.service';
 import { User } from './user.entity';
+import { Stream } from 'node:stream';
 
 @Injectable()
 export class UsersHttpService {
@@ -126,13 +127,13 @@ export class UsersHttpService {
     }
   }
 
-  async getUsersAvatar(filename: string): Promise<any> {
+  async getUsersAvatar(filename: string): Promise<Stream> {
     try {
       const res = await this.fileStorageService.getFile(filename);
       if (!res) {
         throw new Error(`Could not get avatar from ${filename}`);
       }
-      return { success: true, buffer: res };
+      return res;
     } catch (error) {
       throw new NotFoundException(
         {

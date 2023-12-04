@@ -24,6 +24,7 @@ export default {
     AVATAR_QUALITY: 80, // 80%
     AVATAR_CHROMA_SUBSAMPLING: '4:4:4',
     AVATAR_FORMAT: 'jpg',
+    AVATAR_MIN_SIZE_TO_OPTIMIZE: 200 * 1000 // 100 kB
   },
 
   USERS: {
