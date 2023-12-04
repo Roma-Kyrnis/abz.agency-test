@@ -41,7 +41,7 @@ export class UsersHttpService {
     try {
       await this.fileStorageService.savePhoto(photoName, photo.buffer);
     } catch (error) {
-      throw new ConflictException(
+      throw new UnprocessableEntityException(
         {
           success: false,
           message: 'Validation failed',
